@@ -79,17 +79,25 @@ def test_plt():
     plt.plot([100,0],[100,0], 'c', linewidth=5)
     plt.show()
 
+# plots heatmap of inputted 2d array
+# interpolation = 'nearest' -> hard edge transition
+# interpolation = 'bicubic' -> smooth edge transition
 def plot_np_array(arr):
-    plt.plot(arr)
+    plt.imshow(arr, cmap='hot', interpolation='nearest')
     plt.show()
-    
+# plots and saves heatmap of inputted 2d array
+def plot_and_save_np_array(arr, filename):
+    plt.imshow(arr, cmap='hot', interpolation='nearest')
+    plt.savefig(filename)
+    plt.show()
+
 def main():
     pixel_arr_uint8 = read_image('hat.png', cv2.IMREAD_GRAYSCALE)
     pixel_arr_uint32 = convert_uint8_to_uint32(pixel_arr_uint8)
     integral_image(pixel_arr_uint32)
     print(pixel_arr_uint32)
-    plot_np_array(pixel_arr_uint8)
-    plot_np_array(pixel_arr_uint32)
+    plot_and_save_np_array(pixel_arr_uint8, 'heatmap_hat.png')
+    plot_and_save_np_array(pixel_arr_uint32, 'integral_heatmap_hat.png')
 
     # print(type(pixel_arr_uint32))
     # print(type(pixel_arr_uint32[0][0]))
