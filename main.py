@@ -3,65 +3,57 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-WIDTH = None
-HEIGHT = None
+# Using cv2's builtin arrays
 
 # length = WIDTH
 # width = HEIGHT
-def set_pixel(pixel_arr, row, col, val):
-    global WIDTH
-    pixel_arr[row * WIDTH + col] = val;
-
-def get_pixel_index(row, col):
-    global WIDTH
-    return row * WIDTH + col
-
-def get_pixel_val(pixel_arr, row, col):
-    if (row < 0 or col < 0):
-        return 0
-    return pixel_arr[get_pixel_index(row, col)]
+WIDTH = None
+HEIGHT = None
 
 def print_arr(pixel_arr):
     global WIDTH
     global HEIGHT
     for r in range(WIDTH):
         for c in range(HEIGHT):
-            print(get_pixel_val(pixel_arr, r, c), end="\t")
+            print(pixel_arr[r][c], end="\t")
         print()
 
-def convert_2d_to_1d(arr):
-    pixel_list = []
-    for r in range(len(arr)):
-        for c in range(len(arr[r])):
-            pixel_list.append(arr[r][c])
-    return array.array('i', pixel_list)
-
-def convert_1d_to_2d(pixel_arr):
-    pixel_list = []
-    for r in range(HEIGHT):
-        row_list = []
-        for c in range(WIDTH):
-            row_list.append(get_pixel_val(pixel_arr, r, c))
-        pixel_list.append(row_list)
-    return pixel_list
-
-def readImage(filepath):
+def read_image(filepath, filter):
     global WIDTH
     global HEIGHT
-    img = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(filepath, filter)
     HEIGHT = len(img)
     WIDTH = len(img[0])
-    return convert_2d_to_1d(img)
+    return img
 
+# takes in a filename and a
+# 2 dimensional numpy array of type uint8 - 256
+# saves image as a PNG
 def save_img_as(filename, img):
     cv2.imwrite(filename, img)
+
+def convert_uint8_to_uint32(numpy_arr):
+    # uint32_arr = numpy_arr.view('uint32')
+    # uint32_arr[:][:] = numpy_arr
+
+    # uint32_arr = np.arange(WIDTH * HEIGHT, dtype='uint32').reshape(HEIGHT, WIDTH)
+    # uint32_arr = numpy_arr
+    uint32_arr = numpy_arr.astype('uint32')
+    return uint32_arr
+
+def get_pixel_val(pixel_arr, row, col):
+    if (row <= 0 or col <= 0):
+        return 0
+    return pixel_arr[row][col]
 
 def integral_image(pixel_arr):
     global WIDTH
     global HEIGHT
     for i in range(WIDTH):
         for j in range(HEIGHT):
-            pixel_arr[get_pixel_index(i, j)] += \
+            print("i", i)
+            print('j', j)
+            pixel_arr[i][j] += \
                 get_pixel_val(pixel_arr, i, j - 1) + \
                 get_pixel_val(pixel_arr, i - 1, j) - \
                 get_pixel_val(pixel_arr, i - 1, j - 1)
@@ -69,9 +61,9 @@ def integral_image(pixel_arr):
 def get_difference(pixel_arr, row1, col1, row2, col2):
     sub_row = min(row1, row2)
     sub_col = min(col1, col2)
-    difference = get_pixel_val(pixel_arr, row1, col1) + \
-                 get_pixel_val(pixel_arr, row2, col2) - \
-                 get_pixel_val(pixel_arr, sub_row, sub_col)
+    difference = pixel_arr[row1][col1] + \
+                 pixel_arr[row2][col2] - \
+                 pixel_arr[sub_row][sub_col]
     return difference
 
 def test():
@@ -87,15 +79,23 @@ def test_plt():
     plt.plot([100,0],[100,0], 'c', linewidth=5)
     plt.show()
 
+def plot_np_array(arr):
+    plt.plot(arr)
+    plt.show()
+    
 def main():
-    pixel_arr = readImage('hat.png')
-    integral_image(pixel_arr)
-    cv2_arr = convert_1d_to_2d(pixel_arr)
-    print(cv2_arr)
-    # save_img_as('integral_hat.png', cv2_arr)
+    pixel_arr_uint8 = read_image('hat.png', cv2.IMREAD_GRAYSCALE)
+    pixel_arr_uint32 = convert_uint8_to_uint32(pixel_arr_uint8)
+    integral_image(pixel_arr_uint32)
+    print(pixel_arr_uint32)
+    plot_np_array(pixel_arr_uint8)
+    plot_np_array(pixel_arr_uint32)
+
+    # print(type(pixel_arr_uint32))
+    # print(type(pixel_arr_uint32[0][0]))
+    # save_img_as('integral_hat.png', pixel_arr_uint8)
     # print(get_difference(pixel_arr, 1, 2, 2, 1))
 
-# testing upstream
 # arrays store data more efficiently than lists in python
 if __name__ == "__main__":
     main()
