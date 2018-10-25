@@ -2,6 +2,11 @@ import array
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import logging
+import sys
+
+# logging config
+# logging.basicConfig(stream=sys.stderror, level=logging.debug)
 
 # Using cv2's builtin arrays
 
@@ -9,6 +14,7 @@ import matplotlib.pyplot as plt
 # width = HEIGHT
 WIDTH = None
 HEIGHT = None
+DEBUG = False
 
 def print_arr(pixel_arr):
     global WIDTH
@@ -51,8 +57,8 @@ def integral_image(pixel_arr):
     global HEIGHT
     for i in range(WIDTH):
         for j in range(HEIGHT):
-            print("i", i)
-            print('j', j)
+            # debug_print("i", i)
+            # debug_print('j', j)
             pixel_arr[i][j] += \
                 get_pixel_val(pixel_arr, i, j - 1) + \
                 get_pixel_val(pixel_arr, i - 1, j) - \
@@ -95,14 +101,15 @@ def main():
     pixel_arr_uint8 = read_image('hat.png', cv2.IMREAD_GRAYSCALE)
     pixel_arr_uint32 = convert_uint8_to_uint32(pixel_arr_uint8)
     integral_image(pixel_arr_uint32)
-    print(pixel_arr_uint32)
-    plot_and_save_np_array(pixel_arr_uint8, 'heatmap_hat.png')
-    plot_and_save_np_array(pixel_arr_uint32, 'integral_heatmap_hat.png')
+    # print(pixel_arr_uint32)
+    # plot_and_save_np_array(pixel_arr_uint8, 'heatmap_hat.png')
+    # plot_and_save_np_array(pixel_arr_uint32, 'integral_shat.png')
 
     # print(type(pixel_arr_uint32))
     # print(type(pixel_arr_uint32[0][0]))
     # save_img_as('integral_hat.png', pixel_arr_uint8)
-    # print(get_difference(pixel_arr, 1, 2, 2, 1))
+    print(get_difference(pixel_arr_uint32, 3, 5, 1, 4))
+
 
 # arrays store data more efficiently than lists in python
 if __name__ == "__main__":
